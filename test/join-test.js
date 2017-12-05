@@ -90,6 +90,14 @@ tape("join can use sort merge join on duplicate values", function(test) {
   let operation = arrays.join([{a:1,z:5},{a:1,z:10},{a:3,z:9},{a:1,z:10}], [{a:1,b:7},{a:3,b:8},{a:6,b:9}]);
   operation.key(x => x.a)
   operation.join(arrays.sortMergeJoin)
-  test.deepEqual(operation.apply(), [[{a:1,z:10},{a:1,b:7}], [{a:1,z:10},{a:1,b:7}],[{a:1,z:5},{a:1,b:7}],[{a:3,z:9},{a:3,b:8}]]);
+  test.deepEqual(operation.apply(), [[{a:1,z:5},{a:1,b:7}],[{a:1,z:10},{a:1,b:7}], [{a:1,z:10},{a:1,b:7}],[{a:3,z:9},{a:3,b:8}]]);
+  test.end();
+});
+
+tape("join can use hash join on duplicate values", function(test) {
+  let operation = arrays.join([{a:1,z:5},{a:1,z:10},{a:3,z:9},{a:1,z:10}], [{a:1,b:7},{a:3,b:8},{a:6,b:9}]);
+  operation.key(x => x.a)
+  operation.join(arrays.hashJoin)
+  test.deepEqual(operation.apply(), [[{a:1,z:5},{a:1,b:7}],[{a:1,z:10},{a:1,b:7}], [{a:1,z:10},{a:1,b:7}],[{a:3,z:9},{a:3,b:8}]]);
   test.end();
 });
