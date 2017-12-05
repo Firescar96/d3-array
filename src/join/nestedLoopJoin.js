@@ -1,5 +1,6 @@
 export default function (left, leftAccessor, right, rightAccessor, predicate) {
   predicate = predicate || function(){return true};
+  // let cardinality = Math.min(this.left.length, this.right.length);
   let output = [];
   for(var i = 0; i < left.length; i++) {
     for(var j = 0; j < right.length; j++) {

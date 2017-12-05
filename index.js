@@ -14,7 +14,6 @@ export {default as max} from "./src/max";
 export {default as mean} from "./src/mean";
 export {default as median} from "./src/median";
 export {default as merge} from "./src/merge";
-export {default as hashJoin} from "./src/join/hashJoin";
 export {default as nestedLoopJoin} from "./src/join/nestedLoopJoin";
 export {default as sortMergeJoin} from "./src/join/sortMergeJoin";
 export {default as min} from "./src/min";
