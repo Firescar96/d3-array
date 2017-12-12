@@ -15,13 +15,15 @@ export default function joinBench (name, size, hashJoin, sortedMergeJoin, nested
     chance.mixin({row: () => ({id: chance.character({pool: 'aeiouy'})})});
     const left = chance.n(chance.row, size),
         right = chance.n(chance.row, size),
-        accessor = obj => obj.id
+        accessor = obj => obj.id,
+        predicate = (a, b) => a === b,
+        reducer = (a, b) => [a, b]
     return {
         name,
         tests: {
-            'Hash Join': () => hashJoin(left, accessor, right, accessor),
-            'Sorted Merge Join': () => sortedMergeJoin(left, accessor, right, accessor),
-            'Nested Loop Join': () => nestedLoopJoin(left, accessor, right, accessor)
+            'Hash Join': () => hashJoin(left, accessor, right, accessor, predicate, reducer),
+            'Sorted Merge Join': () => sortedMergeJoin(left, accessor, right, accessor, predicate, reducer),
+            'Nested Loop Join': () => nestedLoopJoin(left, accessor, right, accessor, predicate, reducer)
         }
     };
 }

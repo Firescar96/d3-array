@@ -19,10 +19,14 @@ tape("join can change the data", function(test) {
   test.end();
 });
 
-tape("join returns the cartesian product", function(test) {
-  test.deepEqual(arrays.join([1,2,3], [4,5,6]).predicate(() => true).apply(), [[1,4],[1,5],[1,6],[2,4],[2,5],[2,6],[3,4],[3,5],[3,6]]);
-  test.deepEqual(arrays.join([1,2], [4,5,6]).predicate(() => true).apply(), [[1,4],[1,5],[1,6],[2,4],[2,5],[2,6]]);
-  test.deepEqual(arrays.join([1,2,3], [4,5]).predicate(() => true).apply(), [[1,4],[1,5],[2,4],[2,5],[3,4],[3,5]]);
+tape("join can perform equijoins", function(test) {
+  let operation = arrays.join([{a:1,z:5},{a:1,z:10},{a:3,z:9}], [{a:1,b:7},{a:3,b:8},{a:6,b:9}]);
+  operation.key(x => x.a)
+  test.deepEqual(operation.apply(), [[{a:1,z:5},{a:1,b:7}],[{a:1,z:10},{a:1,b:7}],[{a:3,z:9},{a:3,b:8}]]);
+  operation.leftKey(x => x.z)
+  test.deepEqual(operation.apply(), []);
+  operation.rightKey(x => x.b)
+  test.deepEqual(operation.apply(), [[{a:3,z:9},{a:6,b:9}]]);
   test.end();
 });
 
@@ -45,15 +49,12 @@ tape("join can use predicate to return values with sums > 6", function(test) {
   test.end();
 });
 
-tape("join can use predicate to perform equijoin", function(test) {
-  let operation = arrays.join([{a:1,z:5},{a:1,z:10},{a:3,z:9}], [{a:1,b:7},{a:3,b:8},{a:6,b:9}]);
-  operation.key(x => x.a)
-  operation.predicate((a,b) => a == b)
-  test.deepEqual(operation.apply(), [[{a:1,z:5},{a:1,b:7}],[{a:1,z:10},{a:1,b:7}],[{a:3,z:9},{a:3,b:8}]]);
-  operation.leftKey(x => x.z)
-  test.deepEqual(operation.apply(), []);
-  operation.rightKey(x => x.b)
-  test.deepEqual(operation.apply(), [[{a:3,z:9},{a:6,b:9}]]);
+tape("join returns the cartesian product with a true predicate", function(test) {
+  let operation = arrays.join().predicate(() => true);
+
+  test.deepEqual(operation.data([1,2,3], [4,5,6]).apply(), [[1,4],[1,5],[1,6],[2,4],[2,5],[2,6],[3,4],[3,5],[3,6]]);
+  test.deepEqual(operation.data([1,2], [4,5,6]).apply(), [[1,4],[1,5],[1,6],[2,4],[2,5],[2,6]]);
+  test.deepEqual(operation.data([1,2,3], [4,5]).apply(), [[1,4],[1,5],[2,4],[2,5],[3,4],[3,5]]);
   test.end();
 });
 

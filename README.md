@@ -380,3 +380,85 @@ Returns the number of bins according to [Scott’s normal reference rule](https:
 <a name="thresholdSturges" href="#thresholdSturges">#</a> d3.<b>thresholdSturges</b>(<i>values</i>) [<>](https://github.com/d3/d3-array/blob/master/src/threshold/sturges.js "Source")
 
 Returns the number of bins according to [Sturges’ formula](https://en.wikipedia.org/wiki/Histogram#Mathematical_definition); the input *values* must be numbers.
+
+### Joins
+D3 supports doing database style joins between arrays.
+
+```js
+d3.join([{a:1,z:5},{a:1,z:10},{a:3,z:9},{a:1,z:10}], [{a:1,b:7},{a:3,b:8},{a:6,b:9}])
+  .key(x => x.a)
+  .join(d3.sortMergeJoin)
+```
+
+<a name="join" href="#join">#</a> d3.<b>join</b>(<i>leftDataset</i>, <i>rightDataset</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/index.js "Source")
+
+Creates and returns a new instance of the d3 join API. *join* in the following API calls refer to this join instance. If left and right values are specified then they are stored in the instance as references to the left and right datasets respectively to be joined. Some dataset must either be passed in on initialization or via the $join.data$ function below for a join to successfully occur.
+
+<a name="joinData" href="#joinData">#</a> join.<b>data</b>(<i>leftDataset</i>, <i>rightDataset</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/index.js "Source")
+
+Updates the left and right datasets to the values passed in.
+
+<a name="joinLeftKey" href="#joinLeftKey">#</a> join.<b>leftKey</b>(<i>accessorFunction</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/index.js "Source")
+
+Selectively updates the left dataset accessor.
+
+<a name="joinRightKey" href="#joinRightKey">#</a> join.<b>rightKey</b>(<i>accessorFunction</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/index.js "Source")
+
+Selectively updates the right dataset accessor.
+
+<a name="joinKey" href="#joinKey">#</a> join.<b>key</b>(<i>accessorFunction</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/index.js "Source")
+
+Updates the accessor function for both the left and right datasets to $value$. If a key is not specified by the user the default is the identity function.
+
+<a name="joinJoin" href="#joinJoin">#</a> join.<b>join</b>(<i>joinFunction</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/index.js "Source")
+
+Updates the function used to join the two datasets. This value can either be user defined or one of the join implementations described below. The value must follow the same method signature as the reference join implementations. The default join function is the nested loop join.
+
+<a name="joinReduce" href="#joinReduce">#</a> join.<b>reduce</b>(<i>reduceFunction</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/index.js "Source")
+
+Is a convenience function that modifies the output of the join. If defined, each tuple to be output is first sent through the reduceFunction to be converted to an alternate value. The default is for the output to be a tuple of the elements from each dataset that matched. This is equivalent to the function $(a, b) => [a, b]$.
+
+<a name="joinPredicate" href="#joinPredicate">#</a> join.<b>predicate</b>(<i>predicateFunction</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/index.js "Source")
+
+Adds a filter the values output when the join is run. The default is a function which checks for equality between two values and returns true for matches.
+
+<a name="joinApply" href="#joinApply">#</a> join.<b>apply</b>() [<>](https://github.com/d3/d3-array/blob/master/src/join/index.js "Source")
+
+Actually executes the join with all the configurations specified by the user. While the other operations do constant time updates, the runtime of this function is dependent upon the join algorithm used, accessor functions, predicate function, and size of the input datasets.
+
+### Join Method Signatures
+When using $d3.join$ you can specify your own functions as long as it is compatible with the appropriate method signature. These signatures are as follows:
+
+<p># accessorFunction(<i>input</i>) => output<p>
+
+The input and output types can be any type but are single elements. from the dataset, the output is fully determined by the accessor function.
+
+<p># joinFunction(<i>leftDataset</i>, <i>leftAccessorFunction</i>, <i>rightDataset</i>, <i>rightAccessorFunction</i>, <i>predicateFunction</i>) => output</p>
+
+Values for all of these fields will be passed in by d3.join. The values may be user specified or defaults. Although the builtin joins expects an iterable datatype such as an array or string for each dataset, if the user specifies their own join method they are free to use any datatype.
+
+<p># predicateFunction(leftValue, rightValue) => output</p>
+
+The left and right values are single elements obtained from the left and right datasets and passed through the left and right accessor functions respectively. The predicate must output a boolean value, true if the record should be kept in the result and false if it should be thrown away.
+
+<p># reduceFunction(leftValue, rightValue) => output</p>
+
+The reduce function changes the type and structure of the output of tuples. The input is two single elements which have passed the check by $predicateFunction$. The output is the desired output format of tuples.
+
+### Join Implementations
+
+These functions are typically not used directly; instead pass them to [*join*.join](#joinJoin). Below are three commonly used join types. Each uses the *joinFunction* syntax given above.
+
+
+<a name="nestedLoopJoin" href="#nestedLoopJoin">#</a> d3.<b>nestedLoopJoin</b>(<i>leftDataset</i>, <i>leftAccessorFunction</i>, <i>rightDataset</i>, <i>rightAccessorFunction</i>, <i>predicateFunction</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/nestedLoopJoin.js "Source")
+
+Uses a nested for loop to iterate through both datasets and outputs all tuples that satisfy the predicate.
+
+<a name="sortMergeJoin" href="#sortMergeJoin">#</a> d3.<b>sortMergeJoin</b>(<i>leftDataset</i>, <i>leftAccessorFunction</i>, <i>rightDataset</i>, <i>rightAccessorFunction</i>, <i>predicateFunction</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/sortMergeJoin.js "Source")
+
+First sorts each dataset then walks both to find those that satisfy the *predicateFunction*. It has support for repeated values and will output a tuple for each repeated value in both the left and right datasets.
+
+
+<a name="hashJoin" href="#hashJoin">#</a> d3.<b>hashJoin</b>(<i>leftDataset</i>, <i>leftAccessorFunction</i>, <i>rightDataset</i>, <i>rightAccessorFunction</i>, <i>predicateFunction</i>) [<>](https://github.com/d3/d3-array/blob/master/src/join/hashJoin.js "Source")
+
+Iterates through the first dataset and hashes every object element, then iterates through the second dataset and outputs tuples that have the same hash and satisfy the predicate.

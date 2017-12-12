@@ -4,10 +4,11 @@ class Join {
   constructor (left, right) {
     this.left = left;
     this.right = right;
-    this.leftKeyFunction = this.defaultKeyFunction;
-    this.rightKeyFunction = this.defaultKeyFunction;
+    this.leftKeyFunction = this._defaultKeyFunction;
+    this.rightKeyFunction = this._defaultKeyFunction;
+    this.predicateFunction = this._defaultPredicateFunction;
+    this.reduceFunction = this._defaultReduceFunction;
     this.joinFunction = nljoin;
-    this.reduceFunction = null;
   }
 
   data (left, right) {
@@ -45,8 +46,16 @@ class Join {
     return this;
   }
 
-  defaultKeyFunction (x) {
+  _defaultKeyFunction (x) {
     return x;
+  }
+
+  _defaultPredicateFunction (a, b) {
+    return a === b;
+  }
+
+  _defaultReduceFunction (a, b) {
+    return [a, b];
   }
 
   join (value) {
@@ -65,15 +74,7 @@ class Join {
   }
 
   apply() {
-    let joinOutput =  this.joinFunction(this.left, this.leftKeyFunction, this.right, this.rightKeyFunction, this.predicateFunction);
-    let reduceOutput = joinOutput;
-    if(this.reduceFunction) {
-      reduceOutput = []
-      for(var i = 0; i < joinOutput.length; i ++) {
-        reduceOutput.push(this.reduceFunction(...joinOutput[i]))
-      }
-    }
-    return reduceOutput;
+    return this.joinFunction(this.left, this.leftKeyFunction, this.right, this.rightKeyFunction, this.predicateFunction, this.reduceFunction);
   }
 }
 
