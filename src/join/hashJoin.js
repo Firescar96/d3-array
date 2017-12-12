@@ -1,4 +1,4 @@
-export default function (left, leftAccessor, right, rightAccessor) {
+export default function (left, leftAccessor, right, rightAccessor, predicate, reducer) {
   let output = [];
   let index = new Map();
   var i
@@ -11,7 +11,7 @@ export default function (left, leftAccessor, right, rightAccessor) {
   for(i = 0; i < right.length; i++) {
     let leftValue = index.get(rightAccessor(right[i]));
     if(leftValue) {
-      leftValue.forEach(val => output.push([val, right[i]]))
+      leftValue.forEach(val => output.push(reducer(val, right[i])))
     }
   }
   return output;

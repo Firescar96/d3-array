@@ -1,5 +1,4 @@
-export default function (left, leftAccessor, right, rightAccessor, predicate) {
-  predicate = predicate || function(){return true};
+export default function (left, leftAccessor, right, rightAccessor, predicate, reducer) {
   let sortFunction = ((a,b) => a < b ? -1 : a > b ? 1 : 0);
   let output = [];
   let sortedLeft = left.map(a => a).sort((a,b) => sortFunction(leftAccessor(a), leftAccessor(b)));
@@ -10,8 +9,8 @@ export default function (left, leftAccessor, right, rightAccessor, predicate) {
     let curLeft = sortedLeft[leftIndex];
     let curRight = sortedRight[rightIndex];
     if (curLeft && curRight && sortFunction(leftAccessor(curLeft), rightAccessor(curRight)) == 0) {
-          if(predicate(curLeft, curRight)) {
-            output.push([curLeft, curRight]);
+          if(predicate(leftAccessor(curLeft), rightAccessor(curRight))) {
+            output.push(reducer(curLeft, curRight));
           }
 
           let nextLeft = sortedLeft[leftIndex + 1];
