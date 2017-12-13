@@ -16,7 +16,7 @@ export default function joinBench (name, size, hashJoin, sortedMergeJoin, nested
     const left = chance.n(chance.row, size),
         right = chance.n(chance.row, size),
         accessor = obj => obj.id,
-        predicate = (a, b) => a === b,
+        predicate = (a, la, b, lb) => la(a) === lb(b),
         reducer = (a, b) => [a, b]
     return {
         name,

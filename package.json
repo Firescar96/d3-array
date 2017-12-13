@@ -46,5 +46,9 @@
     "gulp": "~3.9",
     "gulp-benchmark": "~1.1",
     "gulp-load-plugins": "~1.5"
+  },
+  "dependencies": {
+    "benchmark": "^2.1.4",
+    "d3-dsv": "^1.0.8"
   }
 }
